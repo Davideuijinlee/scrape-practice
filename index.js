@@ -1,5 +1,6 @@
 const fetch = require('node-fetch');
 const cheerio = require('cheerio');
+const fs = require('fs');
  
 const URL = 'https://www.imdb.com/title/tt0102926/?ref_=nv_sr_1';
  
@@ -21,5 +22,16 @@ fetch(URL, {
     const $ = cheerio.load(html);
     let title =$('div[class="title_wrapper"] > h1').text();
     let rating = $('div[class="ratingValue"] > strong > span').text();
-    console.log(title, rating);
+    let poster = $('div[class="poster"] > a > img').attr('src');
+
+    let genres = [];
+    $('div[class="title_wrapper"] a[href^="/genre/"]').each((i, elm) => {
+      let genre = $(elm).text();
+
+      genres.push(genre)
+    })
+    
+    console.log(title, rating, poster);
+
+    fs.writeFileSync('./data.json', JSON.stringify(title, rating, poster), 'utf-8');
 });
